@@ -1,0 +1,323 @@
+{
+    "Scheduler": {
+        "dt": 0.002,
+        "CheckFrequency": true,
+        "InferTask": {
+            "PolicyFrequency": 10
+        }
+    },
+    "Workers": {
+        "ResetPosition": {
+            "Duration": 3
+        },
+        "ActionManager": {
+            "SwitchIntervalTime": 1.0
+        },
+        "Commander": {
+            "EchoCmd": true,
+            "UpperLimit": [
+                1.5,
+                0.5,
+                1.57
+            ],
+            "LowerLimit": [
+                -0.6,
+                -0.5,
+                -1.57
+            ],
+            "DiscreteCmdStep": [
+                0.1,
+                0.05,
+                0.05
+            ],
+            "ReverseJoystickAxis": [
+                false,
+                true,
+                true
+            ]
+        },
+        "MotorPDLoop": {
+            "Kp": [
+                100,
+                100,
+                200,
+                100,
+                100,
+                40,
+                100,
+                100,
+                40,
+                150,
+                150,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40,
+                40
+            ],
+            "Kd": [
+                2,
+                2,
+                5,
+                2,
+                2,
+                5,
+                2,
+                2,
+                5,
+                4,
+                4,
+                1,
+                1,
+                2,
+                2,
+                1,
+                1,
+                2,
+                2,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ]
+        },
+        "MotorControl": {
+            "ControlMode": "Torque",
+            "TorqueLimit": [
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000,
+                1000
+            ],
+            "PosFilterWeight": [
+                1
+            ],
+            "VelFilterWeight": [
+                1
+            ],
+            "DefaultPosition": [
+                -0.2,
+                -0.2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.42,
+                0.42,
+                0.35,
+                0.35,
+                -0.23,
+                -0.23,
+                0.18,
+                -0.18,
+                0,
+                0,
+                0,
+                0,
+                0.87,
+                0.87,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        "ImuProcess": {
+            "AccFilterWeight": [
+                1
+            ],
+            "GyroFilterWeight": [
+                1
+            ],
+            "MagFilterWeight": [
+                1
+            ]
+        },
+        "AsyncLogger": {
+            "LogPath": "./log/extra_data/",
+            "WriteBackFrequency": 100
+        },
+        "NN": {
+            "Inference": {
+                "WarmUpModel": false,
+                "IntraNumberThreads": 1
+            },
+            "Network": {
+                "ModelPath": "../../example/BitbotSimulation/CheckPoints/policy.onnx",
+                "InputNodeNames": [
+                    "obs"
+                ],
+                "OutputNodeNames": [
+                    "actions"
+                ],
+                // walk
+                // "Cycle_time": 0.85,
+                // "Gait_air_ratio_l": 0.38,
+                // "Gait_air_ratio_r": 0.38,
+                // "Gait_phase_offset_l": 0.38,
+                // "Gait_phase_offset_r": 0.88
+                // run
+                "Cycle_time": 0.5,
+                "Gait_air_ratio_l": 0.6,
+                "Gait_air_ratio_r": 0.6,
+                "Gait_phase_offset_l": 0.6,
+                "Gait_phase_offset_r": 0.1
+            },
+            "Preprocess": {
+                "ObservationScales": {
+                    "lin_vel": 2.0,
+                    "ang_vel": 0.25, //walk 1 run 0.25
+                    "project_gravity": 1,
+                    "dof_pos": 1,
+                    "dof_vel": 1
+                },
+                "ClipObservations": 100
+            },
+            "Postprocess": {
+                "clip_actions": 100,
+                "action_scale": [
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25,
+                    0.25
+                ],
+                "joint_clip_upper": [
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100,
+                    100
+                ],
+                "joint_clip_lower": [
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100,
+                    -100
+                ]
+            }
+        }
+    }
+}

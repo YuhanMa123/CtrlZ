@@ -1,0 +1,211 @@
+{
+  "Scheduler": {
+    "dt": 0.001,
+    "CheckFrequency": true,
+    "InferTask": {
+      "PolicyFrequency": 20
+    }
+  },
+  "Workers": {
+    "ResetPosition": {
+      "Duration": 3
+    },
+    "ActionManager": {
+      "SwitchIntervalTime": 1.0
+    },
+    "Commander": {
+      "EchoCmd": true,
+      "UpperLimit": [
+        1.0,
+        0.5,
+        1.57
+      ],
+      "LowerLimit": [
+        -0.6,
+        -0.5,
+        -1.57
+      ],
+      "DiscreteCmdStep": [
+        0.1,
+        0.05,
+        0.05
+      ],
+      "ReverseJoystickAxis": [
+        false,
+        true,
+        true
+      ]
+    },
+    "MotorPDLoop": {
+      "Kp": [
+        500,
+        60,
+        500,
+        60,
+        700,
+        700,
+        700,
+        700,
+        700,
+        700,
+        40,
+        40,
+        20,
+        20
+      ],
+      "Kd": [
+        5,
+        3,
+        5,
+        3,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        3,
+        3,
+        2,
+        2
+      ]
+    },
+    "MotorControl": {
+      "ControlMode": "Torque",
+      "TorqueLimit": [
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000,
+        1000
+      ],
+      "PosFilterWeight": [
+        1
+      ],
+      "VelFilterWeight": [
+        1
+      ],
+      "DefaultPosition": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0,
+        0,
+        -0.3,
+        -0.3,
+        0.6,
+        0.6,
+        -0.3,
+        -0.3,
+        0,
+        0
+      ]
+    },
+    "ImuProcess": {
+      "AccFilterWeight": [
+        1
+      ],
+      "GyroFilterWeight": [
+        1
+      ],
+      "MagFilterWeight": [
+        1
+      ]
+    },
+    "AsyncLogger": {
+      "LogPath": "./log/extra_data/",
+      "WriteBackFrequency": 100
+    },
+    "NN": {
+      "Inference": {
+        "WarmUpModel": false,
+        "IntraNumberThreads": 1
+      },
+      "Network": {
+        "ModelPath": "../../example/BitbotSimulation/CheckPoints/policy_amp_nolin.onnx",
+        "InputNodeNames": [
+          "obs"
+        ],
+        "OutputNodeNames": [
+          "actions"
+        ],
+        "Cycle_time": 0.85,
+        "Gait_air_ratio_l": 0.38,
+        "Gait_air_ratio_r": 0.38,
+        "Gait_phase_offset_l": 0.38,
+        "Gait_phase_offset_r": 0.88
+      },
+      "Preprocess": {
+        "ObservationScales": {
+          "lin_vel": 1.0,
+          "ang_vel": 1,
+          "project_gravity": 1,
+          "dof_pos": 1,
+          "dof_vel": 1
+        },
+        "ClipObservations": 100
+      },
+      "Postprocess": {
+        "clip_actions": 100,
+        "action_scale": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "joint_clip_upper": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "joint_clip_lower": [
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100
+        ]
+      }
+    }
+  }
+}
