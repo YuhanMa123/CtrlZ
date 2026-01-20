@@ -10,7 +10,7 @@ Forked from [CtrlZ](https://github.com/ZzzzzzS/CtrlZ)，荣耀属于ZZS！
 
 大家有兴趣可以关注大佬github：[ZzzzzzS](https://github.com/ZzzzzzS)。
 
-大佬的个人主页：https://blog.zzshub.cn/archives/index.html。
+大佬的个人主页：[zzshub](https://blog.zzshub.cn)。
 
 # 安装
 
