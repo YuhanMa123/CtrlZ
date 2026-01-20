@@ -7,8 +7,10 @@ CtrlZ是一个多线程强化学习部署框架，用于简化学习类机器人
 
 ## Fork
 Forked from [CtrlZ](https://github.com/ZzzzzzS/CtrlZ)，荣耀属于ZZS！
-大家有兴趣可以关注大佬github：[ZzzzzzS](https://github.com/ZzzzzzS)
-大佬的个人主页：https://blog.zzshub.cn/archives/index.html
+
+大家有兴趣可以关注大佬github：[ZzzzzzS](https://github.com/ZzzzzzS)。
+
+大佬的个人主页：https://blog.zzshub.cn/archives/index.html。
 
 # 安装
 
