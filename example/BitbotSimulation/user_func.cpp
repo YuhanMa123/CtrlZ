@@ -39,7 +39,8 @@ void ConfigFunc(const KernelBus& bus, UserData& d) {
     cfg_root = nlohmann::json::parse(cfg_file, nullptr, true, true);
     cfg_workers = cfg_root["Workers"];
   }
-
+  d.ImuPtr = bus.GetDevice<DeviceImu>(IMU_ID_MAP).value();
+  d.ImuAlterPtr = bus.GetDevice<DeviceImu>(ALTER_IMU_ID_MAP).value();
   Apply(d.JointsPtr, [&bus](DeviceJoint** joint, size_t i) {
     *joint = bus.GetDevice<DeviceJoint>(JOINT_ID_MAP[i]).value();
   });
@@ -67,7 +68,7 @@ void ConfigFunc(const KernelBus& bus, UserData& d) {
 
   // 创建各个worker
   d.ImuWorker = d.TaskScheduler->template CreateWorker<ImuWorkerType>(
-      bus.GetDevice<DeviceImu>(IMU_ID_MAP).value(), cfg_workers["ImuProcess"]);
+      d.ImuPtr, cfg_workers["ImuProcess"]);
   d.MotorWorker = d.TaskScheduler->template CreateWorker<MotorWorkerType>(
       cfg_workers["MotorControl"], d.JointsPtr);
   d.MotorPDWorker = d.TaskScheduler->template CreateWorker<MotorPDWorkerType>(
@@ -79,11 +80,22 @@ void ConfigFunc(const KernelBus& bus, UserData& d) {
   d.ActionManagementWorker =
       d.TaskScheduler->template CreateWorker<ActionManagementWorkerType>(
           cfg_workers["ActionManager"]);
-
+  d.AlterImuWorker = d.TaskScheduler->template CreateWorker<AlterImuWorkerType>(
+      [&d](SchedulerType::Ptr scheduler) {
+        RealNumber roll = d.ImuAlterPtr->GetRoll();
+        RealNumber pitch = d.ImuAlterPtr->GetPitch();
+        RealNumber yaw = d.ImuAlterPtr->GetYaw();
+        Vec3 euler_angles = Vec3({roll, pitch, yaw});
+        scheduler->template SetData<"AlterAngleValue">(euler_angles);
+      });
   // 创建主任务MainTask列表，并添加worker
   d.TaskScheduler->CreateTaskList("MainTask", 1, true);
+  // // BHR机器人
+  // d.TaskScheduler->AddWorkers("MainTask",
+  //                             {d.ImuWorker, d.MotorPDWorker, d.MotorWorker});
+  // 宇树机器人
   d.TaskScheduler->AddWorkers("MainTask",
-                              {d.ImuWorker, d.MotorPDWorker, d.MotorWorker});
+                              {d.ImuWorker, d.AlterImuWorker, d.MotorWorker});
 
   // 创建推理任务列表，并添加worker，设置推理任务频率
   d.NetInferWorker =
@@ -92,6 +104,7 @@ void ConfigFunc(const KernelBus& bus, UserData& d) {
   // 推理任务
   d.TaskScheduler->CreateTaskList(
       "InferTask", cfg_root["Scheduler"]["InferTask"]["PolicyFrequency"]);
+
   d.TaskScheduler->AddWorkers("InferTask",
                               {d.CommanderWorker, d.NetInferWorker,
                                d.ActionManagementWorker, d.Logger});
@@ -216,6 +229,8 @@ std::optional<bitbot::StateId> EventJoystickYawChange(
 
 void StateWaiting(const bitbot::KernelInterface& kernel,
                   bitbot::ExtraData& extra_data, UserData& d) {
+  // 空闲等待状态，重置目标位置防止突变
+  d.MotorWorker->SetCurrentPositionAsTargetPosition();
   // 在具体状态中只需要调用调度器的SpinOnce函数即可，调度器会根据设置自动调度任务
   d.TaskScheduler->SpinOnce();
 }

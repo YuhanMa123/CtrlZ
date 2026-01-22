@@ -51,6 +51,7 @@ constexpr z::CTSPair<"AngleRaw", Vec3> ImuMagRawPair;
 constexpr z::CTSPair<"AccelerationValue", Vec3> ImuAccFilteredPair;
 constexpr z::CTSPair<"AngleValue", Vec3> ImuMagFilteredPair;
 constexpr z::CTSPair<"AngleVelocityValue", Vec3> ImuGyroFilteredPair;
+constexpr z::CTSPair<"AlterAngleValue", Vec3> ImuAlterAngleFilteredPair;
 
 /********** Linear Velocity Pair ***********/
 constexpr z::CTSPair<"LinearVelocityValue", Vec3> LinearVelocityValuePair;
@@ -96,14 +97,15 @@ using SchedulerType = z::AbstractScheduler<
     CurrentMotorVelPair, CurrentMotorTorquePair, TargetMotorTorquePair,
     LimitTargetMotorTorquePair, CurrentMotorVelRawPair, CurrentMotorPosRawPair,
     NetLastActionPair, NetCommand3Pair, NetCommand6Pair,
-    NetProjectedGravityPair, NetScaledActionPair, NetClockVectorPair,
-    InferenceTimePair, Net1OutPair>;
+    ImuAlterAngleFilteredPair, NetProjectedGravityPair, NetScaledActionPair,
+    NetClockVectorPair, InferenceTimePair, Net1OutPair>;
 
 // define workers
 using MotorResetWorkerType =
     z::MotorResetPositionWorker<SchedulerType, RealNumber, JOINT_NUMBER>;
 using ImuWorkerType =
     z::ImuProcessWorker<SchedulerType, DeviceImu*, RealNumber>;
+using AlterImuWorkerType = z::SimpleCallbackWorker<SchedulerType>;
 using MotorWorkerType = z::MotorControlWorker<SchedulerType, DeviceJoint*,
                                               RealNumber, JOINT_NUMBER>;
 using MotorPDWorkerType =
@@ -114,8 +116,9 @@ using LoggerWorkerType = z::AsyncLoggerWorker<
     ImuMagFilteredPair, TargetMotorPosPair, TargetMotorVelPair,
     CurrentMotorPosPair, CurrentMotorVelPair, CurrentMotorTorquePair,
     NetCommand3Pair, TargetMotorTorquePair, LimitTargetMotorTorquePair,
-    NetLastActionPair, NetCommand6Pair, NetProjectedGravityPair,
-    NetScaledActionPair, NetClockVectorPair, InferenceTimePair, Net1OutPair>;
+    NetLastActionPair, NetCommand6Pair, ImuAlterAngleFilteredPair,
+    NetProjectedGravityPair, NetScaledActionPair, NetClockVectorPair,
+    InferenceTimePair, Net1OutPair>;
 
 using CmdWorkerType =
     z::NetCmdWorker<SchedulerType, RealNumber, NetCommand3Pair>;

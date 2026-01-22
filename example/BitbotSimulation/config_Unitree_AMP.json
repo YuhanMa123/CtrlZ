@@ -101,7 +101,7 @@
             ]
         },
         "MotorControl": {
-            "ControlMode": "Torque",
+            "ControlMode": "Position",
             "TorqueLimit": [
                 1000,
                 1000,
