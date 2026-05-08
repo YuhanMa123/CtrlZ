@@ -16,7 +16,7 @@
         "Commander": {
             "EchoCmd": true,
             "UpperLimit": [
-                1.5,
+                1.9,
                 0.5,
                 1.57
             ],
@@ -192,7 +192,7 @@
                 "IntraNumberThreads": 1
             },
             "Network": {
-                "ModelPath": "../../example/BitbotSimulation/CheckPoints/policy.onnx",
+                "ModelPath": "../../example/BitbotSimulation/CheckPoints/policy_noclock_pen_3.onnx",
                 "InputNodeNames": [
                     "obs"
                 ],
@@ -218,7 +218,7 @@
                     "ang_vel": 0.25, //walk 1 run 0.25
                     "project_gravity": 1,
                     "dof_pos": 1,
-                    "dof_vel": 1
+                    "dof_vel": 0.05
                 },
                 "ClipObservations": 100
             },

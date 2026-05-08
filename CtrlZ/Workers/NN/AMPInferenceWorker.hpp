@@ -105,11 +105,15 @@ class AMPInferenceWorker
     auto cos_clock_scales = math::Vector<InferencePrecision, 2>::ones();
     auto ratio_scales = math::Vector<InferencePrecision, 2>::ones();
 
+    // this->InputScaleVec =
+    //     math::cat(this->Scales_ang_vel, this->Scales_project_gravity,
+    //               this->Scales_command3, this->Scales_dof_pos,
+    //               this->Scales_dof_vel, this->Scales_last_action,
+    //               sin_clock_scales, cos_clock_scales, ratio_scales);
     this->InputScaleVec =
         math::cat(this->Scales_ang_vel, this->Scales_project_gravity,
                   this->Scales_command3, this->Scales_dof_pos,
-                  this->Scales_dof_vel, this->Scales_last_action,
-                  sin_clock_scales, cos_clock_scales, ratio_scales);
+                  this->Scales_dof_vel, this->Scales_last_action);
     this->OutputScaleVec = this->ActionScale;
 
     // warp input tensor
@@ -201,9 +205,14 @@ class AMPInferenceWorker
     // #########################################################################
 
     // 共 57 维
+    // auto SingleInputVecScaled =
+    //     math::cat(AngVel, ProjectedGravity, UserCmd3, CurrentMotorPos,
+    //               CurrentMotorVel, LastAction, ClockSin, ClockCos,
+    //               PhaseRatio) *
+    //     this->InputScaleVec;
     auto SingleInputVecScaled =
         math::cat(AngVel, ProjectedGravity, UserCmd3, CurrentMotorPos,
-                  CurrentMotorVel, LastAction, ClockSin, ClockCos, PhaseRatio) *
+                  CurrentMotorVel, LastAction) *
         this->InputScaleVec;
 
     this->HistoryInputBuffer.push(SingleInputVecScaled);
@@ -226,6 +235,7 @@ class AMPInferenceWorker
    */
   void PostProcess() override {
     auto LastAction = this->OutputTensor.toVector();
+
     auto ClipedLastAction =
         MotorValVec::clamp(LastAction, -this->ClipAction, this->ClipAction);
     this->Scheduler->template SetData<concat(NetName, "NetLastAction")>(
@@ -247,11 +257,16 @@ class AMPInferenceWorker
         static_cast<InferencePrecision>(duration.count());
     this->Scheduler->template SetData<concat(NetName, "InferenceTime")>(
         inference_time);
+    // 在 PostProcess 中添加,判断是不是训练太久模型飞了
+    // if (std::isnan(LastAction[0]) || std::isinf(LastAction[0])) {
+    //   std::cerr << "Warning: Model output NaN or Inf!" << std::endl;
+    // }
+    // std::cout << "Model Action Raw: " << LastAction << std::endl;
   }
 
  private:
   static constexpr size_t INPUT_TENSOR_LENGTH_UNIT =
-      3 + 3 + 3 + JOINT_NUMBER + JOINT_NUMBER + JOINT_NUMBER + 2 + 2 + 2;
+      3 + 3 + 3 + JOINT_NUMBER + JOINT_NUMBER + JOINT_NUMBER;
   static constexpr size_t INPUT_TENSOR_LENGTH =
       INPUT_TENSOR_LENGTH_UNIT * INPUT_STUCK_LENGTH;
   // joint number

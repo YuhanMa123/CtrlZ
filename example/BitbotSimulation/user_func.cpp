@@ -71,8 +71,10 @@ void ConfigFunc(const KernelBus& bus, UserData& d) {
       d.ImuPtr, cfg_workers["ImuProcess"]);
   d.MotorWorker = d.TaskScheduler->template CreateWorker<MotorWorkerType>(
       cfg_workers["MotorControl"], d.JointsPtr);
-  d.MotorPDWorker = d.TaskScheduler->template CreateWorker<MotorPDWorkerType>(
-      cfg_workers["MotorPDLoop"]);
+  // 非力位混合电机还是要用这个worker
+  // d.MotorPDWorker = d.TaskScheduler->template
+  // CreateWorker<MotorPDWorkerType>(
+  //     cfg_workers["MotorPDLoop"]);
   d.Logger = d.TaskScheduler->template CreateWorker<LoggerWorkerType>(
       cfg_workers["AsyncLogger"]);
   d.CommanderWorker = d.TaskScheduler->template CreateWorker<CmdWorkerType>(
