@@ -16,12 +16,12 @@
         "Commander": {
             "EchoCmd": true,
             "UpperLimit": [
-                1.9,
+                1.5,
                 0.5,
                 1.57
             ],
             "LowerLimit": [
-                -0.6,
+                -0.5,
                 -0.5,
                 -1.57
             ],
@@ -140,18 +140,19 @@
                 1
             ],
             // Order follows example/BitbotSimulation/types.hpp::JOINT_ID_MAP.
-            // Values align with training-side init_state.joint_pos in
-            // example/BitbotSimulation/models/Unitree_g1/cfg.py.
+            // Entries not explicitly given by the training spec remain 0.0 and
+            // should be revisited once articulation joint order/default offsets
+            // are fully confirmed.
             "DefaultPosition": [
                 -0.312,
                 -0.312,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
                 0.669,
                 0.669,
                 0.2,
@@ -160,18 +161,18 @@
                 -0.363,
                 0.2,
                 -0.2,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.6,
-                0.6,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
             ]
         },
         "ImuProcess": {
@@ -195,43 +196,34 @@
                 "IntraNumberThreads": 1
             },
             "Network": {
-                "ModelPath": "/home/mayh/MYH/Project_code/Python/robot_lab/logs/rsl_rl/unitree_g1_run_amp/2026-05-18_23-14-40/exported/policy.onnx",
+                "ModelPath": "/home/mayh/MYH/Project_code/Python/robot_lab/logs/rsl_rl/unitree_g1_walk_amp/2026-05-25_15-02-29_unitree_g1_walk_amp_vae_curriculum/exported/policy.onnx",
                 "InputNodeNames": [
-                    "obs"
+                    "actor_obs",
+                    "obs_history"
                 ],
                 "OutputNodeNames": [
                     "actions"
-                ],
-                // walk
-                // "Cycle_time": 0.85,
-                // "Gait_air_ratio_l": 0.38,
-                // "Gait_air_ratio_r": 0.38,
-                // "Gait_phase_offset_l": 0.38,
-                // "Gait_phase_offset_r": 0.88
-                // run
-                "Cycle_time": 0.5,
-                "Gait_air_ratio_l": 0.6,
-                "Gait_air_ratio_r": 0.6,
-                "Gait_phase_offset_l": 0.6,
-                "Gait_phase_offset_r": 0.1
+                ]
             },
             "Preprocess": {
                 // HistoryLayout controls how temporal history is flattened
                 // before feeding ONNX:
                 // "frame": [frame_t-k, ..., frame_t]
                 // "term":  [term0_t-k..t, term1_t-k..t, ...]
-                "HistoryLayout": "term",
+                // VAE 的 观测是frame 拼接
+                "HistoryLayout": "frame",
                 "ObservationScales": {
-                    "lin_vel": 2.0,
-                    "ang_vel": 0.25, //walk 1 run 0.25
-                    "project_gravity": 1,
-                    "dof_pos": 1,
+                    "lin_vel": 1.0,
+                    "ang_vel": 0.2,
+                    "project_gravity": 1.0,
+                    "dof_pos": 1.0,
                     "dof_vel": 0.05
                 },
                 "ClipObservations": 100
             },
             "Postprocess": {
                 "clip_actions": 100,
+                // Order follows example/BitbotSimulation/types.hpp::JOINT_ID_MAP.
                 "action_scale": [
                     0.547546,
                     0.547546,
@@ -263,9 +255,6 @@
                     0.074501,
                     0.074501
                 ],
-                // Order follows example/BitbotSimulation/types.hpp::JOINT_ID_MAP.
-                // These are the MuJoCo joint ranges from
-                // example/BitbotSimulation/models/Unitree_g1/g1_29dof_rev_1_0.xml.
                 "joint_clip_upper": [
                     100,
                     100,

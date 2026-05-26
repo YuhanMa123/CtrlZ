@@ -79,9 +79,31 @@ namespace z
          * @brief get data from the buffer
          *
          * @param _Index index of the data
+         * @return const T& data
+         */
+        const T& operator()(int _Index) const
+        {
+            return this->Data[(_Index + this->CurrentIndex) % this->Size];
+        }
+
+        /**
+         * @brief get data from the buffer
+         *
+         * @param _Index index of the data
          * @return T& data
          */
         T& operator[](int _Index)
+        {
+            return this->Data[(_Index + this->CurrentIndex) % this->Size];
+        }
+
+        /**
+         * @brief get data from the buffer
+         *
+         * @param _Index index of the data
+         * @return const T& data
+         */
+        const T& operator[](int _Index) const
         {
             return this->Data[(_Index + this->CurrentIndex) % this->Size];
         }
@@ -97,6 +119,16 @@ namespace z
         }
 
         /**
+         * @brief get the oldest data from the buffer
+         *
+         * @return const T& oldest data reference
+         */
+        const T& front() const
+        {
+            return this->Data[this->CurrentIndex];
+        }
+
+        /**
          * @brief get the newest data from the buffer
          *
          * @return T& newest data reference
@@ -107,11 +139,31 @@ namespace z
         }
 
         /**
+         * @brief get the newest data from the buffer
+         *
+         * @return const T& newest data reference
+         */
+        const T& back() const
+        {
+            return this->Data[(this->CurrentIndex - 1 + this->Size) % this->Size];
+        }
+
+        /**
          * @brief get the size of the buffer
          *
          * @return int size of the buffer
          */
         int size()
+        {
+            return this->Size;
+        }
+
+        /**
+         * @brief get the size of the buffer
+         *
+         * @return int size of the buffer
+         */
+        int size() const
         {
             return this->Size;
         }

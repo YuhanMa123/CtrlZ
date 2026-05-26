@@ -9,9 +9,13 @@
  *
  */
 #pragma once
+#include <array>
+#include <string>
+
 #include "AbstractInferenceWorker.hpp"
 #include "Utils/MathTypes.hpp"
 #include "Utils/StaticStringUtils.hpp"
+#include "Utils/ZenBuffer.hpp"
 #include "nlohmann/json.hpp"
 #include "onnxruntime_cxx_api.h"
 
@@ -71,6 +75,11 @@ class CommonLocoInferenceWorker
                 "InferencePrecision must be a arithmetic type");
 
  public:
+  enum class HistoryLayoutMode {
+    Frame,
+    Term,
+  };
+
   using Base =
       AbstractNetInferenceWorker<SchedulerType, NetName, InferencePrecision>;
   using Base::DefaultAllocator__;
@@ -118,6 +127,18 @@ class CommonLocoInferenceWorker
     this->Scales_dof_pos = MotorValVec::ones() * scales_dof_pos;
     this->Scales_dof_vel = MotorValVec::ones() * scales_dof_vel;
     this->Scales_last_action = MotorValVec::ones();
+
+    if (PreprocessCfg.contains("HistoryLayout")) {
+      const std::string layout = PreprocessCfg["HistoryLayout"].get<std::string>();
+      if (layout == "frame") {
+        this->HistoryLayout__ = HistoryLayoutMode::Frame;
+      } else if (layout == "term") {
+        this->HistoryLayout__ = HistoryLayoutMode::Term;
+      } else {
+        throw(std::runtime_error(
+            "HistoryLayout must be either 'frame' or 'term'"));
+      }
+    }
 
     // load obs clip
     this->ClipObservation =
@@ -172,6 +193,8 @@ class CommonLocoInferenceWorker
     std::cout << "Scales_dof_pos=" << this->Scales_dof_pos << std::endl;
     std::cout << "Scales_dof_vel=" << this->Scales_dof_vel << std::endl;
     std::cout << "Scales_last_action=" << this->Scales_last_action << std::endl;
+    std::cout << "HistoryLayout=" << this->GetHistoryLayoutName()
+              << std::endl;
     std::cout << "Scales_action=" << this->ActionScale << std::endl;
     this->PrintSplitLine();
   }
@@ -183,6 +206,48 @@ class CommonLocoInferenceWorker
   virtual ~CommonLocoInferenceWorker() {}
 
  protected:
+  // Flatten a history buffer either frame-by-frame or term-by-term according to
+  // Preprocess.HistoryLayout.
+  template <size_t FrameLength, size_t HistoryLength, size_t TermCount>
+  math::Vector<InferencePrecision, FrameLength * HistoryLength> FlattenHistory(
+      const z::RingBuffer<math::Vector<InferencePrecision, FrameLength>>& buffer,
+      const std::array<size_t, TermCount>& term_sizes) const {
+    using FrameVec = math::Vector<InferencePrecision, FrameLength>;
+    using HistoryVec = math::Vector<InferencePrecision, FrameLength * HistoryLength>;
+
+    HistoryVec flattened;
+    if (this->HistoryLayout__ == HistoryLayoutMode::Frame) {
+      for (size_t i = 0; i < HistoryLength; ++i) {
+        std::copy(buffer[i].begin(), buffer[i].end(),
+                  flattened.begin() + i * FrameLength);
+      }
+      return flattened;
+    }
+
+    size_t src_offset = 0;
+    size_t dst_offset = 0;
+    for (size_t term_idx = 0; term_idx < TermCount; ++term_idx) {
+      const size_t term_size = term_sizes[term_idx];
+      for (size_t history_idx = 0; history_idx < HistoryLength; ++history_idx) {
+        const FrameVec& frame = buffer[history_idx];
+        std::copy(frame.begin() + src_offset, frame.begin() + src_offset + term_size,
+                  flattened.begin() + dst_offset);
+        dst_offset += term_size;
+      }
+      src_offset += term_size;
+    }
+
+    if (src_offset != FrameLength) {
+      throw(std::runtime_error("History term sizes do not sum to frame length"));
+    }
+    return flattened;
+  }
+
+  const char* GetHistoryLayoutName() const {
+    return this->HistoryLayout__ == HistoryLayoutMode::Frame ? "frame"
+                                                             : "term";
+  }
+
   /// @brief 电机向量类型
   using MotorValVec = math::Vector<InferencePrecision, JOINT_NUMBER>;
 
@@ -234,5 +299,10 @@ class CommonLocoInferenceWorker
 
   /// @brief 观测量上一次动作缩放
   MotorValVec Scales_last_action;
+
+  /// @brief 历史观测 flatten 方式:
+  /// frame: [frame_t-k, ..., frame_t]
+  /// term:  [term0_t-k..t, term1_t-k..t, ...]
+  HistoryLayoutMode HistoryLayout__ = HistoryLayoutMode::Frame;
 };
 };  // namespace z

@@ -146,6 +146,11 @@
         "Gait_phase_offset_r": 0.88
       },
       "Preprocess": {
+        // HistoryLayout controls how temporal history is flattened
+        // before feeding ONNX:
+        // "frame": [frame_t-k, ..., frame_t]
+        // "term":  [term0_t-k..t, term1_t-k..t, ...]
+        "HistoryLayout": "frame",
         "ObservationScales": {
           "lin_vel": 1.0,
           "ang_vel": 1,

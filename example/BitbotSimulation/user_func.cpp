@@ -33,8 +33,7 @@ void ConfigFunc(const KernelBus& bus, UserData& d) {
   nlohmann::json cfg_workers;
   {
     // NOTE: 注意将配置文件路径修改为自己的路径
-    std::string path =
-        PROJECT_ROOT_DIR + std::string("/config_Unitree_AMP.json");
+    std::string path = PROJECT_ROOT_DIR + std::string("/config_AMP_VAE.json");
     std::ifstream cfg_file(path);
     cfg_root = nlohmann::json::parse(cfg_file, nullptr, true, true);
     cfg_workers = cfg_root["Workers"];
@@ -101,8 +100,11 @@ void ConfigFunc(const KernelBus& bus, UserData& d) {
 
   // 创建推理任务列表，并添加worker，设置推理任务频率
   d.NetInferWorker =
-      d.TaskScheduler->template CreateWorker<AMPInferenceWorkerType>(
+      d.TaskScheduler->template CreateWorker<AMPVAEInferenceWorkerType>(
           cfg_workers["NN"], cfg_workers["MotorControl"]);
+  // d.NetInferWorker =
+  //     d.TaskScheduler->template CreateWorker<AMPInferenceWorkerType>(
+  //         cfg_workers["NN"], cfg_workers["MotorControl"]);
   // 推理任务
   d.TaskScheduler->CreateTaskList(
       "InferTask", cfg_root["Scheduler"]["InferTask"]["PolicyFrequency"]);

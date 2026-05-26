@@ -21,6 +21,7 @@
 #include "Workers/MotorResetPositionWorker.hpp"
 // #include "Workers/NN/EncoderOutputWorker.hpp"
 #include "Workers/NN/AMPInferenceWorker.hpp"
+#include "Workers/NN/AMPVAEInferenceWorker.hpp"
 #include "Workers/NN/EraxLikeInferenceWorker.hpp"
 #include "Workers/NN/HumanoidGymInferenceWorker.hpp"
 #include "Workers/NN/UniFPInferenceWorker.hpp"
@@ -131,6 +132,7 @@ using ActionManagementWorkerType =
 
 /******define actor net************/
 constexpr size_t OBSERVATION_STUCK_LENGTH = 10;
+constexpr size_t OBSERVATION_VAE_LENGTH = 3;
 constexpr size_t OBSERVATION_EXTRA_LENGTH = 10;
 
 // using HumanoidGymInferWorkerType =
@@ -148,3 +150,6 @@ constexpr size_t OBSERVATION_EXTRA_LENGTH = 10;
 using AMPInferenceWorkerType =
     z::AMPInferenceWorker<SchedulerType, Net1Name, RealNumber,
                           OBSERVATION_STUCK_LENGTH, JOINT_NUMBER>;
+using AMPVAEInferenceWorkerType =
+    z::AMPVAEInferenceWorker<SchedulerType, Net1Name, RealNumber,
+                             OBSERVATION_VAE_LENGTH, JOINT_NUMBER>;

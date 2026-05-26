@@ -1,0 +1,151 @@
+<mujoco model="g1_terrain_course">
+  <default>
+    <default class="terrain_contact">
+      <geom type="box"
+            contype="1"
+            conaffinity="1"
+            condim="4"
+            friction="1.2 0.08 0.02"
+            solref="0.005 1"
+            solimp="0.95 0.99 0.001"
+            group="3" />
+    </default>
+  </default>
+
+  <asset>
+    <material name="terrain_ground_mat" rgba="0.28 0.33 0.30 1" />
+    <material name="terrain_slope_mat" rgba="0.42 0.35 0.24 1" />
+    <material name="terrain_stair_mat" rgba="0.36 0.36 0.42 1" />
+    <material name="terrain_trench_mat" rgba="0.18 0.18 0.20 1" />
+  </asset>
+
+  <worldbody>
+    <!--
+      Terrain parameter interface:
+      1. Flat ground length: edit x-size/pos of terrain_start, terrain_mid, terrain_finish.
+      2. Slope steepness: edit terrain_slope_up / terrain_slope_down euler and z position.
+      3. Stair difficulty: edit each stair geom top height through its z position/size.
+      4. Trench width/depth: edit trench_left, trench_bottom, trench_right x positions and trench_bottom z.
+      5. All terrain geoms are static MuJoCo collision geoms and provide real contact response.
+    -->
+
+    <!-- Start flat section -->
+    <geom name="terrain_start"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="1.20 0 -0.10"
+          size="1.20 1.40 0.10" />
+
+    <!-- Up slope: rise about 0.25m over 1.6m -->
+    <geom name="terrain_slope_up"
+          class="terrain_contact"
+          material="terrain_slope_mat"
+          pos="3.20 0 0.076"
+          size="0.80 1.20 0.05"
+          euler="0 -0.155 0" />
+
+    <!-- Landing before stairs -->
+    <geom name="terrain_upper_landing"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="4.30 0 0.125"
+          size="0.30 1.20 0.125" />
+
+    <!-- Upstairs -->
+    <geom name="terrain_stair_up_1"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="4.75 0 0.165"
+          size="0.15 1.20 0.165" />
+    <geom name="terrain_stair_up_2"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="5.05 0 0.205"
+          size="0.15 1.20 0.205" />
+    <geom name="terrain_stair_up_3"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="5.35 0 0.245"
+          size="0.15 1.20 0.245" />
+    <geom name="terrain_stair_up_4"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="5.65 0 0.285"
+          size="0.15 1.20 0.285" />
+
+    <!-- Top landing -->
+    <geom name="terrain_top_landing"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="6.25 0 0.285"
+          size="0.30 1.20 0.285" />
+
+    <!-- Downstairs -->
+    <geom name="terrain_stair_down_1"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="6.85 0 0.245"
+          size="0.15 1.20 0.245" />
+    <geom name="terrain_stair_down_2"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="7.15 0 0.205"
+          size="0.15 1.20 0.205" />
+    <geom name="terrain_stair_down_3"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="7.45 0 0.165"
+          size="0.15 1.20 0.165" />
+    <geom name="terrain_stair_down_4"
+          class="terrain_contact"
+          material="terrain_stair_mat"
+          pos="7.75 0 0.125"
+          size="0.15 1.20 0.125" />
+
+    <!-- Landing before down slope -->
+    <geom name="terrain_lower_landing"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="8.15 0 0.125"
+          size="0.25 1.20 0.125" />
+
+    <!-- Down slope back to ground -->
+    <geom name="terrain_slope_down"
+          class="terrain_contact"
+          material="terrain_slope_mat"
+          pos="9.20 0 0.076"
+          size="0.80 1.20 0.05"
+          euler="0 0.155 0" />
+
+    <!-- Mid flat section -->
+    <geom name="terrain_mid"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="10.60 0 -0.10"
+          size="0.60 1.40 0.10" />
+
+    <!-- Trench / ditch -->
+    <geom name="terrain_trench_left"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="11.50 0 -0.10"
+          size="0.30 1.40 0.10" />
+    <geom name="terrain_trench_bottom"
+          class="terrain_contact"
+          material="terrain_trench_mat"
+          pos="12.25 0 -0.525"
+          size="0.45 1.00 0.175" />
+    <geom name="terrain_trench_right"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="13.10 0 -0.10"
+          size="0.40 1.40 0.10" />
+
+    <!-- Finish section -->
+    <geom name="terrain_finish"
+          class="terrain_contact"
+          material="terrain_ground_mat"
+          pos="14.75 0 -0.10"
+          size="1.25 1.40 0.10" />
+  </worldbody>
+</mujoco>

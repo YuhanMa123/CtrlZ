@@ -47,7 +47,8 @@ struct UserData {
   LoggerWorkerType* Logger;
   // EraxLikeInferWorkerType* NetInferWorker;
   // UniFPInferWorkerType* NetInferWorker;
-  AMPInferenceWorkerType* NetInferWorker;
+  AMPVAEInferenceWorkerType* NetInferWorker;
+  // AMPInferenceWorkerType* NetInferWorker;
 
   MotorResetWorkerType* MotorResetWorker;
   CmdWorkerType* CommanderWorker;

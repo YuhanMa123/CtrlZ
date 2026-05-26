@@ -56,6 +56,9 @@ class AMPInferenceWorker
     : public CommonLocoInferenceWorker<SchedulerType, NetName,
                                        InferencePrecision, JOINT_NUMBER> {
  public:
+  static constexpr std::array<size_t, 6> HISTORY_TERM_SIZES = {
+      3, 3, 3, JOINT_NUMBER, JOINT_NUMBER, JOINT_NUMBER};
+
   using MotorValVec = math::Vector<InferencePrecision, JOINT_NUMBER>;
   using ValVec3 = math::Vector<InferencePrecision, 3>;
 
@@ -217,12 +220,9 @@ class AMPInferenceWorker
 
     this->HistoryInputBuffer.push(SingleInputVecScaled);
 
-    math::Vector<InferencePrecision, INPUT_TENSOR_LENGTH> InputVec;
-    for (size_t i = 0; i < INPUT_STUCK_LENGTH; i++) {
-      std::copy(this->HistoryInputBuffer[i].begin(),
-                this->HistoryInputBuffer[i].end(),
-                InputVec.begin() + i * INPUT_TENSOR_LENGTH_UNIT);
-    }
+    const auto InputVec = this->template FlattenHistory<
+        INPUT_TENSOR_LENGTH_UNIT, INPUT_STUCK_LENGTH, HISTORY_TERM_SIZES.size()>(
+        this->HistoryInputBuffer, HISTORY_TERM_SIZES);
 
     this->InputTensor.Array() = decltype(InputVec)::clamp(
         InputVec, -this->ClipObservation, this->ClipObservation);
